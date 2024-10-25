@@ -7,7 +7,7 @@ import { github_token } from ".";
 
 // close issue
 const CloseParams = z.object({
-  reason: z.enum(["not_planned", "completed", "reopened"]),
+  reason: z.enum(["not_planned", "completed"]),
 });
 type CloseParams = z.infer<typeof CloseParams>;
 export const closeIssue = zodFunction({

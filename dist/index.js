@@ -40024,7 +40024,7 @@ const github = __importStar(__nccwpck_require__(3802));
 const _1 = __nccwpck_require__(3300);
 // close issue
 const CloseParams = zod_1.z.object({
-    reason: zod_1.z.enum(["not_planned", "completed", "reopened"]),
+    reason: zod_1.z.enum(["not_planned", "completed"]),
 });
 exports.closeIssue = zodFunction({
     name: "closeIssue",
@@ -40132,7 +40132,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.action_event = exports.github_token = exports.user_input = exports.system_prompt = exports.openai_model = exports.openai_api_key = exports.openai_base_url = void 0;
+exports.action_event = exports.available_tools = exports.github_token = exports.user_input = exports.system_prompt = exports.openai_model = exports.openai_api_key = exports.openai_base_url = void 0;
 const github_calls_1 = __nccwpck_require__(331);
 const github = __importStar(__nccwpck_require__(3802));
 const core = __importStar(__nccwpck_require__(4708));
@@ -40157,10 +40157,25 @@ function checkInput() {
     if (!exports.github_token) {
         throw new Error("github_token is required");
     }
-    if (github.context.eventName.includes("issue")) {
-        tools.push(github_calls_1.closeIssue, github_calls_1.lockIssue, github_calls_1.commentIssue);
+    if (!exports.available_tools) {
+        exports.available_tools = "closeIssue,lockIssue,commentIssue";
     }
-    // todo: add more tools for other events
+    exports.available_tools.split(",").forEach((tool) => {
+        switch (tool) {
+            case "closeIssue":
+                tools.push(github_calls_1.closeIssue);
+                break;
+            case "lockIssue":
+                tools.push(github_calls_1.lockIssue);
+                break;
+            case "commentIssue":
+                tools.push(github_calls_1.commentIssue);
+                break;
+            default:
+                throw new Error(`Tool "${tool}" is not available`);
+            // todo: support more tools
+        }
+    });
 }
 async function main() {
     exports.openai_base_url = core.getInput("openai_base_url");
@@ -40169,6 +40184,7 @@ async function main() {
     exports.system_prompt = core.getInput("system_prompt");
     exports.user_input = core.getInput("user_input");
     exports.github_token = core.getInput("github_token");
+    exports.available_tools = core.getInput("available_tools");
     exports.action_event = github.context.eventName;
     checkInput();
     const openai = new openai_1.default({

@@ -10,6 +10,7 @@ export let openai_model: string;
 export let system_prompt: string;
 export let user_input: string;
 export let github_token: string;
+export let available_tools: string;
 export let action_event: string;
 let tools: RunnableToolFunctionWithParse<any>[] = [];
 
@@ -32,10 +33,25 @@ function checkInput() {
   if (!github_token) {
     throw new Error("github_token is required");
   }
-  if (github.context.eventName.includes("issue")) {
-    tools.push(closeIssue, lockIssue, commentIssue);
+  if (!available_tools) {
+    available_tools = "closeIssue,lockIssue,commentIssue";
   }
-  // todo: add more tools for other events
+  available_tools.split(",").forEach((tool) => {
+    switch (tool) {
+      case "closeIssue":
+        tools.push(closeIssue);
+        break;
+      case "lockIssue":
+        tools.push(lockIssue);
+        break;
+      case "commentIssue":
+        tools.push(commentIssue);
+        break;
+      default:
+        throw new Error(`Tool "${tool}" is not available`);
+      // todo: support more tools
+    }
+  });
 }
 
 async function main() {
@@ -45,6 +61,7 @@ async function main() {
   system_prompt = core.getInput("system_prompt");
   user_input = core.getInput("user_input");
   github_token = core.getInput("github_token");
+  available_tools = core.getInput("available_tools");
   action_event = github.context.eventName;
   checkInput();
   const openai = new OpenAI({

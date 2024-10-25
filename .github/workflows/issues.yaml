@@ -17,6 +17,7 @@ jobs:
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
           openai_model: ${{ vars.OPENAI_MODEL }}
           system_prompt: ${{ vars.SYSTEM_PROMPT }}
+          available_tools: ${{ vars.AVAILABLE_TOOLS }}
           user_input: |
             Please review this issue:
             Title: "${{ github.event.issue.title }}"

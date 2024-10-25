@@ -24,6 +24,10 @@ inputs:
   user_input:
     description: "User Input for the assistant"
     required: true
+  available_tools:
+    description: "Available tools for the assistant, separated by comma"
+    required: false
+    default: "closeIssue,lockIssue,commentIssue"
   github_token:
     description: "GitHub Token"
     required: true
