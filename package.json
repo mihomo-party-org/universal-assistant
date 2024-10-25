@@ -5,7 +5,7 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "description": "A universal assistant to help handle GitHub matters",
+  "description": "A universal AI assistant to help handle GitHub matters",
   "scripts": {
     "build": "ncc build src/index.ts -o dist",
     "start": "pnpm build && node dist/index.js"
