@@ -1,0 +1,33 @@
+{
+  "name": "universal-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "description": "A universal assistant to help handle GitHub matters",
+  "scripts": {
+    "build": "ncc build src/index.ts -o dist",
+    "start": "pnpm build && node dist/index.js"
+  },
+  "keywords": [
+    "AI",
+    "assistant",
+    "GitHub",
+    "Actions"
+  ],
+  "author": "mihomo-party-org",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.7.9",
+    "@vercel/ncc": "^0.38.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0",
+    "openai": "^4.68.4",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.5"
+  }
+}

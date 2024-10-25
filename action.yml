@@ -1,0 +1,33 @@
+name: Universal Assistant
+author: mihomo-party-org
+description: A universal assistant to help handle GitHub matters
+
+branding:
+  icon: "cpu"
+  color: "black"
+
+inputs:
+  openai_base_url:
+    description: "OpenAI Base URL"
+    required: false
+    default: "https://api.openai.com/v1"
+  openai_api_key:
+    description: "OpenAI API Key"
+    required: true
+  openai_model:
+    description: "OpenAI Model"
+    required: false
+    default: "gpt-4o-mini"
+  system_prompt:
+    description: "System Prompt for the assistant"
+    required: true
+  user_input:
+    description: "User Input for the assistant"
+    required: true
+  github_token:
+    description: "GitHub Token"
+    required: true
+
+runs:
+  using: node20
+  main: dist/index.js

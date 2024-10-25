@@ -1,0 +1,24 @@
+name: Review Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Review Issues
+        uses: ./
+        with:
+          openai_base_url: ${{ secrets.OPENAI_BASE_URL }}
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          openai_model: ${{ vars.OPENAI_MODEL }}
+          system_prompt: ${{ vars.SYSTEM_PROMPT }}
+          user_input: |
+            Please review this issue:
+            Title: "${{ github.event.issue.title }}"
+            Content: "${{ github.event.issue.body }}"
+          github_token: ${{ secrets.POMPURIN404_TOKEN }}
