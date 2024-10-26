@@ -5,11 +5,10 @@ import zodToJsonSchema from "zod-to-json-schema";
 import * as github from "@actions/github";
 import { github_token } from ".";
 
-const octokit = github.getOctokit(github_token);
-
 type Tools = Record<string, RunnableToolFunctionWithParse<any>>;
 
 export async function init_tools(): Promise<Tools> {
+  const octokit = github.getOctokit(github_token);
   let repo_labels: [string, ...string[]] = [
     "bug",
     "enhancement",
@@ -132,12 +131,37 @@ export async function init_tools(): Promise<Tools> {
     schema: RenameParams,
   });
 
+  // review pull request
+  const ReviewParams = z.object({
+    event: z.enum(["APPROVE", "REQUEST_CHANGES", "COMMENT"]),
+    content: z.string(),
+  });
+  type ReviewParams = z.infer<typeof ReviewParams>;
+  const reviewPullRequest = zodFunction({
+    name: "reviewPullRequest",
+    description: "Review Pull Request",
+    function: async ({ event, content }: ReviewParams) => {
+      octokit.rest.pulls.createReview({
+        owner: github.context.issue.owner,
+        repo: github.context.issue.repo,
+        pull_number: github.context.issue.number,
+        body: content,
+        event,
+      });
+      console.log(
+        `#${github.context.issue.number} Reviewd as ${event}\n${content}`
+      );
+    },
+    schema: ReviewParams,
+  });
+
   return {
     closeIssue,
     lockIssue,
     commentIssue,
     labelIssue,
     renameIssue,
+    reviewPullRequest,
   };
 }
 
