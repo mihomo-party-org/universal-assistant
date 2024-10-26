@@ -9,6 +9,7 @@
 - [x] Comment issue(commentIssue)
 - [x] Label issue(labelIssue)
 - [x] Rename issue(renameIssue)
+- [x] Review pull request(reviewPullRequest)
 - [ ] and more...
 
 ## Inputs

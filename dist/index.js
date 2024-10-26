@@ -40022,8 +40022,8 @@ const zod_1 = __nccwpck_require__(931);
 const zod_to_json_schema_1 = __importDefault(__nccwpck_require__(3109));
 const github = __importStar(__nccwpck_require__(3802));
 const _1 = __nccwpck_require__(3300);
-const octokit = github.getOctokit(_1.github_token);
 async function init_tools() {
+    const octokit = github.getOctokit(_1.github_token);
     let repo_labels = [
         "bug",
         "enhancement",
@@ -40136,12 +40136,33 @@ async function init_tools() {
         },
         schema: RenameParams,
     });
+    // review pull request
+    const ReviewParams = zod_1.z.object({
+        event: zod_1.z.enum(["APPROVE", "REQUEST_CHANGES", "COMMENT"]),
+        content: zod_1.z.string(),
+    });
+    const reviewPullRequest = zodFunction({
+        name: "reviewPullRequest",
+        description: "Review Pull Request",
+        function: async ({ event, content }) => {
+            octokit.rest.pulls.createReview({
+                owner: github.context.issue.owner,
+                repo: github.context.issue.repo,
+                pull_number: github.context.issue.number,
+                body: content,
+                event,
+            });
+            console.log(`#${github.context.issue.number} Reviewd as ${event}\n${content}`);
+        },
+        schema: ReviewParams,
+    });
     return {
         closeIssue,
         lockIssue,
         commentIssue,
         labelIssue,
         renameIssue,
+        reviewPullRequest,
     };
 }
 // utils function
