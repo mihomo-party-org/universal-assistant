@@ -1,4 +1,4 @@
-import { closeIssue, lockIssue, commentIssue } from "./github_calls";
+import { init_tools } from "./github_calls";
 import * as github from "@actions/github";
 import * as core from "@actions/core";
 import OpenAI from "openai";
@@ -14,7 +14,7 @@ export let available_tools: string;
 export let action_event: string;
 let tools: RunnableToolFunctionWithParse<any>[] = [];
 
-function checkInput() {
+async function checkInput() {
   if (!openai_base_url) {
     openai_base_url = "https://api.openai.com/v1";
   }
@@ -36,21 +36,12 @@ function checkInput() {
   if (!available_tools) {
     available_tools = "closeIssue,lockIssue,commentIssue";
   }
+  const all_tools = await init_tools();
   available_tools.split(",").forEach((tool) => {
-    switch (tool) {
-      case "closeIssue":
-        tools.push(closeIssue);
-        break;
-      case "lockIssue":
-        tools.push(lockIssue);
-        break;
-      case "commentIssue":
-        tools.push(commentIssue);
-        break;
-      default:
-        throw new Error(`Tool "${tool}" is not available`);
-      // todo: support more tools
+    if (!all_tools[tool]) {
+      throw new Error(`Tool "${tool}" is not available`);
     }
+    tools.push(all_tools[tool]);
   });
 }
 
@@ -63,7 +54,7 @@ async function main() {
   github_token = core.getInput("github_token");
   available_tools = core.getInput("available_tools");
   action_event = github.context.eventName;
-  checkInput();
+  await checkInput();
   const openai = new OpenAI({
     baseURL: openai_base_url,
     apiKey: openai_api_key,

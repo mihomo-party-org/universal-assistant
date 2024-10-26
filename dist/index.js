@@ -40017,69 +40017,133 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.commentIssue = exports.lockIssue = exports.closeIssue = void 0;
+exports.init_tools = init_tools;
 const zod_1 = __nccwpck_require__(931);
 const zod_to_json_schema_1 = __importDefault(__nccwpck_require__(3109));
 const github = __importStar(__nccwpck_require__(3802));
 const _1 = __nccwpck_require__(3300);
-// close issue
-const CloseParams = zod_1.z.object({
-    reason: zod_1.z.enum(["not_planned", "completed"]),
-});
-exports.closeIssue = zodFunction({
-    name: "closeIssue",
-    description: "Close Issue",
-    function: async ({ reason }) => {
-        const octokit = github.getOctokit(_1.github_token);
-        octokit.rest.issues.update({
+const octokit = github.getOctokit(_1.github_token);
+async function init_tools() {
+    let repo_labels = [
+        "bug",
+        "enhancement",
+        "question",
+        "invalid",
+        "wontfix",
+        "duplicate",
+    ];
+    try {
+        const labels = await octokit.rest.issues.listLabelsForRepo({
             owner: github.context.issue.owner,
             repo: github.context.issue.repo,
-            issue_number: github.context.issue.number,
-            state: "closed",
-            state_reason: reason,
         });
-        console.log(`#${github.context.issue.number} closed as ${reason}`);
-    },
-    schema: CloseParams,
-});
-// lock issue
-const LockParams = zod_1.z.object({
-    reason: zod_1.z.enum(["off-topic", "spam", "too heated", "resolved"]),
-});
-exports.lockIssue = zodFunction({
-    name: "lockIssue",
-    description: "Lock Issue",
-    function: async ({ reason }) => {
-        const octokit = github.getOctokit(_1.github_token);
-        octokit.rest.issues.lock({
-            owner: github.context.issue.owner,
-            repo: github.context.issue.repo,
-            issue_number: github.context.issue.number,
-            lock_reason: reason,
-        });
-        console.log(`#${github.context.issue.number} locked as ${reason}`);
-    },
-    schema: LockParams,
-});
-// comment issue
-const CommentParams = zod_1.z.object({
-    content: zod_1.z.string(),
-});
-exports.commentIssue = zodFunction({
-    name: "commentIssue",
-    description: "Comment Issue",
-    function: async ({ content }) => {
-        const octokit = github.getOctokit(_1.github_token);
-        octokit.rest.issues.createComment({
-            owner: github.context.issue.owner,
-            repo: github.context.issue.repo,
-            issue_number: github.context.issue.number,
-            body: content,
-        });
-        console.log(`#${github.context.issue.number} commented: ${content}`);
-    },
-    schema: CommentParams,
-});
+        const labelNames = labels.data.map((label) => label.name);
+        if (labelNames.length > 0) {
+            repo_labels = [labelNames[0], ...labelNames.slice(1)];
+        }
+    }
+    catch (e) {
+        console.log(e);
+    }
+    // close issue
+    const CloseParams = zod_1.z.object({
+        reason: zod_1.z.enum(["not_planned", "completed"]),
+    });
+    const closeIssue = zodFunction({
+        name: "closeIssue",
+        description: "Close Issue",
+        function: async ({ reason }) => {
+            octokit.rest.issues.update({
+                owner: github.context.issue.owner,
+                repo: github.context.issue.repo,
+                issue_number: github.context.issue.number,
+                state: "closed",
+                state_reason: reason,
+            });
+            console.log(`#${github.context.issue.number} closed as ${reason}`);
+        },
+        schema: CloseParams,
+    });
+    // lock issue
+    const LockParams = zod_1.z.object({
+        reason: zod_1.z.enum(["off-topic", "spam", "too heated", "resolved"]),
+    });
+    const lockIssue = zodFunction({
+        name: "lockIssue",
+        description: "Lock Issue",
+        function: async ({ reason }) => {
+            octokit.rest.issues.lock({
+                owner: github.context.issue.owner,
+                repo: github.context.issue.repo,
+                issue_number: github.context.issue.number,
+                lock_reason: reason,
+            });
+            console.log(`#${github.context.issue.number} locked as ${reason}`);
+        },
+        schema: LockParams,
+    });
+    // comment issue
+    const CommentParams = zod_1.z.object({
+        content: zod_1.z.string(),
+    });
+    const commentIssue = zodFunction({
+        name: "commentIssue",
+        description: "Comment Issue",
+        function: async ({ content }) => {
+            octokit.rest.issues.createComment({
+                owner: github.context.issue.owner,
+                repo: github.context.issue.repo,
+                issue_number: github.context.issue.number,
+                body: content,
+            });
+            console.log(`#${github.context.issue.number} commented: ${content}`);
+        },
+        schema: CommentParams,
+    });
+    // label issue
+    const LabelParams = zod_1.z.object({
+        label: zod_1.z.array(zod_1.z.enum(repo_labels)),
+    });
+    const labelIssue = zodFunction({
+        name: "labelIssue",
+        description: "Label Issue",
+        function: async ({ label }) => {
+            octokit.rest.issues.addLabels({
+                owner: github.context.issue.owner,
+                repo: github.context.issue.repo,
+                issue_number: github.context.issue.number,
+                labels: label,
+            });
+            console.log(`#${github.context.issue.number} labeled: ${label}`);
+        },
+        schema: LabelParams,
+    });
+    // rename issue
+    const RenameParams = zod_1.z.object({
+        title: zod_1.z.string(),
+    });
+    const renameIssue = zodFunction({
+        name: "renameIssue",
+        description: "Rename Issue",
+        function: async ({ title }) => {
+            octokit.rest.issues.update({
+                owner: github.context.issue.owner,
+                repo: github.context.issue.repo,
+                issue_number: github.context.issue.number,
+                title: title,
+            });
+            console.log(`#${github.context.issue.number} renamed: ${title}`);
+        },
+        schema: RenameParams,
+    });
+    return {
+        closeIssue,
+        lockIssue,
+        commentIssue,
+        labelIssue,
+        renameIssue,
+    };
+}
 // utils function
 function zodFunction({ function: fn, schema, description = "", name, }) {
     return {
@@ -40138,7 +40202,7 @@ const github = __importStar(__nccwpck_require__(3802));
 const core = __importStar(__nccwpck_require__(4708));
 const openai_1 = __importDefault(__nccwpck_require__(9448));
 let tools = [];
-function checkInput() {
+async function checkInput() {
     if (!exports.openai_base_url) {
         exports.openai_base_url = "https://api.openai.com/v1";
     }
@@ -40160,21 +40224,12 @@ function checkInput() {
     if (!exports.available_tools) {
         exports.available_tools = "closeIssue,lockIssue,commentIssue";
     }
+    const all_tools = await (0, github_calls_1.init_tools)();
     exports.available_tools.split(",").forEach((tool) => {
-        switch (tool) {
-            case "closeIssue":
-                tools.push(github_calls_1.closeIssue);
-                break;
-            case "lockIssue":
-                tools.push(github_calls_1.lockIssue);
-                break;
-            case "commentIssue":
-                tools.push(github_calls_1.commentIssue);
-                break;
-            default:
-                throw new Error(`Tool "${tool}" is not available`);
-            // todo: support more tools
+        if (!all_tools[tool]) {
+            throw new Error(`Tool "${tool}" is not available`);
         }
+        tools.push(all_tools[tool]);
     });
 }
 async function main() {
@@ -40186,7 +40241,7 @@ async function main() {
     exports.github_token = core.getInput("github_token");
     exports.available_tools = core.getInput("available_tools");
     exports.action_event = github.context.eventName;
-    checkInput();
+    await checkInput();
     const openai = new openai_1.default({
         baseURL: exports.openai_base_url,
         apiKey: exports.openai_api_key,

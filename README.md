@@ -6,7 +6,9 @@
 
 - [x] Close issue(closeIssue)
 - [x] Lock issue(lockIssue)
-- [x] Comment issues(commentIssue)
+- [x] Comment issue(commentIssue)
+- [x] Label issue(labelIssue)
+- [x] Rename issue(renameIssue)
 - [ ] and more...
 
 ## Inputs
