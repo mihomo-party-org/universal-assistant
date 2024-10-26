@@ -23,6 +23,18 @@ openai_api_key: # OpenAI API Key
 openai_model: # OpenAI Model
 # Default Value is "gpt-4o-mini"
 
+openai_temperature: # OpenAI Temperature
+# Default not set
+
+openai_top_p: # OpenAI Top P
+# Default not set
+
+openai_frequency_penalty: # OpenAI Frequency Penalty
+# Default not set
+
+openai_presence_penalty: # OpenAI Presence Penalty
+# Default not set
+
 system_prompt: # System Prompt for the assistant
 
 user_input: # User Input for the assistant

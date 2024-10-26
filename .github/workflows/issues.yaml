@@ -23,6 +23,10 @@ jobs:
           openai_base_url: ${{ secrets.OPENAI_BASE_URL }}
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
           openai_model: ${{ vars.OPENAI_MODEL }}
+          openai_temperature: ${{ vars.OPENAI_TEMPERATURE }}
+          openai_top_p: ${{ vars.OPENAI_TOP_P }}
+          openai_frequency_penalty: ${{ vars.OPENAI_FREQUENCY_PENALTY }}
+          openai_presence_penalty: ${{ vars.OPENAI_PRESENCE_PENALTY }}
           system_prompt: ${{ vars.ISSUES_SYSTEM_PROMPT }}
           available_tools: ${{ vars.ISSUES_AVAILABLE_TOOLS }}
           user_input: |

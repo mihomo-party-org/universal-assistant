@@ -18,6 +18,18 @@ inputs:
     description: "OpenAI Model"
     required: false
     default: "gpt-4o-mini"
+  openai_temperature:
+    description: "OpenAI Temperature"
+    required: false
+  openai_top_p:
+    description: "OpenAI Top P"
+    required: false
+  openai_frequency_penalty:
+    description: "OpenAI Frequency Penalty"
+    required: false
+  openai_presence_penalty:
+    description: "OpenAI Presence Penalty"
+    required: false
   system_prompt:
     description: "System Prompt for the assistant"
     required: true
