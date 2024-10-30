@@ -49,6 +49,8 @@ github_token: # GitHub Token
 
 ### Review Issues
 
+Run example: [#26](https://github.com/mihomo-party-org/universal-assistant/issues/26)
+
 ```yaml
 name: Review Issues
 
@@ -67,7 +69,7 @@ jobs:
           openai_api_key: sk-xxxxxx
           openai_model: gpt-4o-mini
           system_prompt: ${{ vars.SYSTEM_PROMPT }}
-          available_tools: closeIssue,lockIssue,commentIssue
+          available_tools: closeIssue,lockIssue,commentIssue,labelIssue,renameIssue
           user_input: |
             Please review this issue:
             Title: "${{ github.event.issue.title }}"
@@ -94,7 +96,9 @@ You are an assistant responsible for reviewing the compliance of GitHub issues. 
 
 Please carefully review the title and content of each issue, make a judgment based on the above criteria, and execute the following actions in order:
 
-1. If you decide to close or lock the issue, use the "commentIssue" tool to send the final result to the user in Simplified Chinese.
-2. If the issue needs to be closed, use the "closeIssue" tool to close the issue.
-3. If the issue needs to be locked, use the "lockIssue" tool to lock the issue.
+1. Use the "labelIssue" tool to add one or more appropriate labels to the issue.
+2. If the issue's title is unsuitable (vague, meaningless, or contains inappropriate content), please use the "renameIssue" tool to set a new title based on the issue's content.
+3. If you decide to close or lock the issue, use the "commentIssue" tool to send the final result to the user.
+4. If the issue needs to be closed, use the "closeIssue" tool to close the issue.
+5. If the issue needs to be locked, use the "lockIssue" tool to lock the issue.
 ```
